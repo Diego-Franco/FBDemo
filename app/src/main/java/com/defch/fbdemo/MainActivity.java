@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
             public void execute(Realm realm)
             {
                 Item item = realm.createObject(Item.class);
-                item.setId(Item.counterId + 1);
                 item.setAction(action);
             }
         });
