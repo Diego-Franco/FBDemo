@@ -9,6 +9,8 @@ import io.realm.annotations.PrimaryKey;
 
 public class Item extends RealmObject
 {
+    public static int counterId = 0;
+
     @PrimaryKey
     private int id;
 
