@@ -1,13 +1,14 @@
 package com.defch.fbdemo;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.defch.fbdemo.adapters.RealmItemsAdapter;
 import com.defch.fbdemo.adapters.TodoListAdapter;
@@ -24,12 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.list)
     RecyclerView recycler;
-
-    @BindView(R.id.edittext)
-    EditText eText;
-
-    @BindView(R.id.add_button)
-    Button addButton;
 
     private TodoListAdapter adapter;
     private Realm realm;
@@ -50,14 +45,7 @@ public class MainActivity extends AppCompatActivity {
         items = realm.where(Item.class).findAll();
         setRealmAdapter(items);
 
-        addButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!eText.getText().toString().isEmpty()) {
-                    addItem(eText.getText().toString());
-                }
-            }
-        });
+
 
         realm.addChangeListener(realmListener);
     }
@@ -72,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void addItem(final String action)
+    private void addItem(final Item addItem)
     {
         realm.executeTransaction(new Realm.Transaction()
         {
@@ -80,11 +68,44 @@ public class MainActivity extends AppCompatActivity {
             public void execute(Realm realm)
             {
                 Item item = realm.createObject(Item.class);
-                item.setAction(action);
+                item.setAction(addItem.getAction());
+                item.setStatus(addItem.getStatus());
             }
         });
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.add)
+        {
+            showEditDialog(null);
+        }
+        return false;
+    }
+
+    private void showEditDialog(Item item)
+    {
+        FragmentManager fm = getSupportFragmentManager();
+        EditItemDialogFragment alertDialog = EditItemDialogFragment.newInstance(item);
+        alertDialog.setItemDialogListener(itemDialogListener);
+        alertDialog.show(fm, "fragment_alert");
+    }
+
+    EditItemDialogFragment.ItemDialogListener itemDialogListener = new EditItemDialogFragment.ItemDialogListener()
+    {
+        @Override
+        public void finishedItem(Item item)
+        {
+            addItem(item);
+        }
+    };
 
     @Override
     protected void onStart() {
@@ -120,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         recycler.setAdapter(adapter);
     }
 
-    public void deleteRow(final int position)
+    private void removeItemFromDB(final int position)
     {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -134,6 +155,41 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void deleteRow(final int position)
+    {
+       AlertDialog aDialog =  new AlertDialog.Builder(MainActivity.this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.remove_item)
+                .setMessage(R.string.remove_item_msg )
+                .setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener()
+                        {
+                            public void onClick(DialogInterface dialog, int whichButton)
+                            {
+                                removeItemFromDB(position);
+                            }
+                        })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+                {
+                            public void onClick(DialogInterface dialog, int whichButton)
+                            {
+                                dialog.dismiss();
+                            }
+                        }).create();
+
+        aDialog.show();
+    }
+
+    public void editTodoItem(int position)
+    {
+
+        RealmResults<Item> deleteItem = realm.where(Item.class).findAll();
+
+        Item item = deleteItem.get(position);
+
+        showEditDialog(item);
     }
 
 }

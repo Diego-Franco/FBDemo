@@ -53,12 +53,30 @@ public class TodoListAdapter extends RealmRecyclerViewAdapater<Item>
 
         vHolder.mTextView.setText(item.getAction());
 
+        if(item.getStatus().equalsIgnoreCase("TODO"))
+        {
+            vHolder.statusTextView.setTextColor(activity.getResources().getColor(android.R.color.holo_red_light));
+        }
+        else if(item.getStatus().equalsIgnoreCase("DONE"))
+        {
+            vHolder.statusTextView.setTextColor(activity.getResources().getColor(android.R.color.holo_green_light));
+        }
+
+        vHolder.statusTextView.setText(item.getStatus());
+
         vHolder.container.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v)
             {
                 ((MainActivity)activity).deleteRow(position);
                 return true;
+            }
+        });
+
+        vHolder.container.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)activity).editTodoItem(position);
             }
         });
     }
@@ -86,10 +104,12 @@ public class TodoListAdapter extends RealmRecyclerViewAdapater<Item>
         // each data item is just a string in this case
         public LinearLayout container;
         public TextView mTextView;
+        public TextView statusTextView;
         public ViewHolder(View v) {
             super(v);
             container = (LinearLayout) v.findViewById(R.id.container);
             mTextView = (TextView) v.findViewById(R.id.list_item);
+            statusTextView = (TextView) v.findViewById(R.id.list_item_status);
         }
     }
 }

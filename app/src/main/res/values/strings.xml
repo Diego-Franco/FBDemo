@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">TODO list</string>
     <string name="button_add">Add</string>
+    <string name="remove_item">Remove Item</string>
+    <string name="remove_item_msg">Are you sure to remove this item?</string>
+    <string-array name="status">
+        <item>TODO</item>
+        <item>DONE</item>
+    </string-array>
 </resources>
