@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
         items = realm.where(Item.class).findAll();
         setRealmAdapter(items);
 
-
-
         realm.addChangeListener(realmListener);
     }
 
@@ -67,9 +65,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void execute(Realm realm)
             {
-                Item item = realm.createObject(Item.class);
-                item.setAction(addItem.getAction());
-                item.setStatus(addItem.getStatus());
+                Item tempItem = realm.where(Item.class).equalTo("action",addItem.getAction()).findFirst();
+
+                if(tempItem == null)
+                {
+                    Item item = realm.createObject(Item.class);
+                    item.setAction(addItem.getAction());
+                    item.setStatus(addItem.getStatus());
+                }
+                else
+                {
+                    tempItem.setAction(addItem.getAction());
+                    tempItem.setStatus(addItem.getStatus());
+                }
             }
         });
 
