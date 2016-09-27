@@ -65,19 +65,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void execute(Realm realm)
             {
-                Item tempItem = realm.where(Item.class).equalTo("action",addItem.getAction()).findFirst();
-
-                if(tempItem == null)
-                {
-                    Item item = realm.createObject(Item.class);
-                    item.setAction(addItem.getAction());
-                    item.setStatus(addItem.getStatus());
-                }
-                else
-                {
-                    tempItem.setAction(addItem.getAction());
-                    tempItem.setStatus(addItem.getStatus());
-                }
+                Item item = realm.createObject(Item.class);
+                item.setAction(addItem.getAction());
+                item.setStatus(addItem.getStatus());
             }
         });
 
@@ -111,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void finishedItem(Item item)
         {
-            addItem(item);
+            todoToDone(item, item.getStatus().equalsIgnoreCase("DONE"));
         }
     };
 
@@ -198,6 +188,60 @@ public class MainActivity extends AppCompatActivity {
         Item item = deleteItem.get(position);
 
         showEditDialog(item);
+    }
+
+    private void editItem(final Item item)
+    {
+        realm.executeTransaction(new Realm.Transaction()
+        {
+
+            @Override
+            public void execute(Realm realm)
+            {
+                Item tempItem = realm.where(Item.class).equalTo("action",item.getAction()).findFirst();
+
+                if(tempItem != null)
+                {
+                    tempItem.setAction(item.getAction());
+                    tempItem.setStatus(item.getStatus());
+
+                }
+            }
+        });
+    }
+
+    public void todoToDone(final Item item, final boolean isDone)
+    {
+
+        realm.executeTransaction(new Realm.Transaction()
+        {
+
+            @Override
+            public void execute(Realm realm)
+            {
+                Item tempItem = realm.where(Item.class).equalTo("action",item.getAction()).findFirst();
+
+                if(tempItem != null)
+                {
+                    tempItem.setAction(item.getAction());
+
+                    if(isDone)
+                    {
+                        tempItem.setStatus("Done");
+                    }
+                    else
+                    {
+                        tempItem.setStatus("TODO");
+                    }
+
+                }
+            }
+        });
+
+        if(adapter != null)
+        {
+            adapter.notifyDataSetChanged();
+        }
     }
 
 }

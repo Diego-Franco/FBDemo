@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -56,15 +58,17 @@ public class TodoListAdapter extends RealmRecyclerViewAdapater<Item>
         if(item.getStatus().equalsIgnoreCase("TODO"))
         {
             vHolder.statusTextView.setTextColor(activity.getResources().getColor(android.R.color.holo_red_light));
+            vHolder.checkTask.setChecked(false);
         }
         else if(item.getStatus().equalsIgnoreCase("DONE"))
         {
             vHolder.statusTextView.setTextColor(activity.getResources().getColor(android.R.color.holo_green_light));
+            vHolder.checkTask.setChecked(true);
         }
 
         vHolder.statusTextView.setText(item.getStatus());
 
-        vHolder.container.setOnLongClickListener(new View.OnLongClickListener() {
+        vHolder.checkTask.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v)
             {
@@ -79,6 +83,19 @@ public class TodoListAdapter extends RealmRecyclerViewAdapater<Item>
                 ((MainActivity)activity).editTodoItem(position);
             }
         });
+
+        vHolder.checkTask.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                ((MainActivity)activity).todoToDone(item, isChecked);
+            }
+        });
+    }
+
+    public void updateItem(Item item)
+    {
+
     }
 
     public void runAnimationHolder(RecyclerView.ViewHolder holder, int position)
@@ -105,11 +122,13 @@ public class TodoListAdapter extends RealmRecyclerViewAdapater<Item>
         public LinearLayout container;
         public TextView mTextView;
         public TextView statusTextView;
+        public CheckBox checkTask;
         public ViewHolder(View v) {
             super(v);
             container = (LinearLayout) v.findViewById(R.id.container);
             mTextView = (TextView) v.findViewById(R.id.list_item);
             statusTextView = (TextView) v.findViewById(R.id.list_item_status);
+            checkTask = (CheckBox) v.findViewById(R.id.check_task);
         }
     }
 }

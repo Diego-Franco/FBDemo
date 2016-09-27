@@ -135,18 +135,6 @@ public class EditItemDialogFragment extends DialogFragment
         return super.onCreateDialog(savedInstanceState);
     }
 
-   /* @Override
-    public void onViewCreated(View view, Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
-
-        editText = (EditText) view.findViewById(R.id.edit_item_text);
-        spinner = (Spinner) view.findViewById(R.id.edit_spinner);
-
-
-    }*/
-
-
     public void setItemDialogListener(ItemDialogListener itemDialogListener)
     {
         this.itemDialogListener = itemDialogListener;
